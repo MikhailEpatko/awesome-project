@@ -64,5 +64,9 @@ func (svc *Service) CreateEmployee(request CreateRequest) (int64, error) {
 	if isExist {
 		return 0, common.AlreadyExistsError{fmt.Sprintf("employee with name %s already exists", request.Name)}
 	}
-	return svc.repo.SaveTx(tx, request.ToEntity())
+	newEmployeeId, err := svc.repo.SaveTx(tx, request.ToEntity())
+	if err != nil {
+		err = fmt.Errorf("error creating employee with name: %s %v", request.Name, err)
+	}
+	return newEmployeeId, err
 }
