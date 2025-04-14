@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"idm/inner/common"
+	"idm/inner/web"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,10 +14,12 @@ import (
 	"testing"
 )
 
+// Объявляем структуру мока сервиса employee.Service
 type MockService struct {
 	mock.Mock
 }
 
+// Реализуем функции мок-сервиса
 func (svc *MockService) FindById(id int64) (Response, error) {
 	args := svc.Called(id)
 	return args.Get(0).(Response), args.Error(1)
@@ -30,19 +33,25 @@ func (svc *MockService) CreateEmployee(request CreateRequest) (int64, error) {
 func TestCreateEmployee(t *testing.T) {
 	var a = assert.New(t)
 
+	// тестируем положительный сценарий: работника создали и получили его id
 	t.Run("should return created employee id", func(t *testing.T) {
-		var app = fiber.New()
+		// Готовим тестовое окружение
+		server := web.NewServer()
 		var svc = new(MockService)
-		var controller = NewController(app, svc)
+		var controller = NewController(server, svc)
 		controller.RegisterRoutes()
+		// Готовим тестовое окружение
 		var body = strings.NewReader("{\"name\": \"john doe\"}")
 		var req = httptest.NewRequest(fiber.MethodPost, "/api/v1/employees", body)
 		req.Header.Set("Content-Type", "application/json")
 
+		// Настраиваем поведение мока в тесте
 		svc.On("CreateEmployee", mock.AnythingOfType("CreateRequest")).Return(int64(123), nil)
 
-		resp, err := app.Test(req)
+		// Отправляем тестовый запрос на веб сервер
+		resp, err := server.App.Test(req)
 
+		// Выполняем проверки полученных данных
 		a.Nil(err)
 		a.NotEmpty(resp)
 		a.Equal(http.StatusOK, resp.StatusCode)
