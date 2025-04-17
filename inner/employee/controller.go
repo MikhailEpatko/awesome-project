@@ -2,7 +2,7 @@ package employee
 
 import (
 	"errors"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v3"
 	"idm/inner/common"
 	"idm/inner/web"
 )
@@ -33,13 +33,12 @@ func (c *Controller) RegisterRoutes() {
 }
 
 // функция-хендлер, которая будет вызываться при POST запросе по маршруту "/api/v1/employees"
-func (c *Controller) CreateEmployee(ctx *fiber.Ctx) {
+func (c *Controller) CreateEmployee(ctx fiber.Ctx) error {
 
 	// анмаршалим JSON body запроса в структуру CreateRequest
 	var request CreateRequest
-	if err := ctx.BodyParser(&request); err != nil {
-		_ = common.ErrResponse(ctx, fiber.StatusBadRequest, err.Error())
-		return
+	if err := ctx.Bind().Body(&request); err != nil {
+		return common.ErrResponse(ctx, fiber.StatusBadRequest, err.Error())
 	}
 
 	// вызываем метод CreateEmployee сервиса employee.Service
@@ -50,20 +49,19 @@ func (c *Controller) CreateEmployee(ctx *fiber.Ctx) {
 		// если сервис возвращает ошибку RequestValidationError или AlreadyExistsError,
 		// то мы возвращаем ответ с кодом 400 (BadRequest)
 		case errors.As(err, &common.RequestValidationError{}) || errors.As(err, &common.AlreadyExistsError{}):
-			_ = common.ErrResponse(ctx, fiber.StatusBadRequest, err.Error())
+			return common.ErrResponse(ctx, fiber.StatusBadRequest, err.Error())
 
 		// если сервис возвращает другую ошибку, то мы возвращаем ответ с кодом 500 (InternalServerError)
 		default:
-			_ = common.ErrResponse(ctx, fiber.StatusInternalServerError, err.Error())
+			return common.ErrResponse(ctx, fiber.StatusInternalServerError, err.Error())
 		}
-		return
 	}
 
 	// функция OkResponse() формирует и направляет ответ в случае успеха
 	if err = common.OkResponse(ctx, newEmployeeId); err != nil {
 
 		// функция ErrorResponse() формирует и направляет ответ в случае ошибки
-		_ = common.ErrResponse(ctx, fiber.StatusInternalServerError, "error returning created employee id")
-		return
+		return common.ErrResponse(ctx, fiber.StatusInternalServerError, "error returning created employee id")
 	}
+	return nil
 }

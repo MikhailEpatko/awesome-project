@@ -2,7 +2,7 @@ package employee
 
 import (
 	"encoding/json"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"idm/inner/common"

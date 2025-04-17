@@ -2,15 +2,34 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"idm/inner/common"
+	"idm/inner/employee"
+	"idm/inner/info"
+	"idm/inner/validator"
+	"idm/inner/web"
 )
 
 func main() {
-	cwd, err := os.Getwd()
+	var server = build()
+	var err = server.App.Listen(":8080")
 	if err != nil {
-		fmt.Println("Ошибка получения текущей рабочей директории:", err)
-		return
+		panic(fmt.Sprintf("http server error: %s", err))
 	}
+}
 
-	fmt.Println("Текущая рабочая директория:", cwd)
+func build() *web.Server {
+	var cfg = common.GetConfig(".env")
+	var server = web.NewServer()
+	var database = common.ConnectDbWithCfg(cfg)
+	var vld = validator.New()
+
+	var employeeRepo = employee.NewRepository(database)
+	var employeeService = employee.NewService(employeeRepo, vld)
+	var employeeController = employee.NewController(server, employeeService)
+	employeeController.RegisterRoutes()
+
+	var infoController = info.NewController(server, cfg)
+	infoController.RegisterRoutes()
+
+	return server
 }

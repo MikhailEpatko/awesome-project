@@ -16,7 +16,7 @@ func (f *Fixture) Employee(name string) int64 {
 	var entity = employee.Entity{
 		Name: name,
 	}
-	var newId, err = f.employees.Save(&entity)
+	var newId, err = f.employees.Save(entity)
 	if err != nil {
 		panic(err)
 	}

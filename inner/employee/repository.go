@@ -17,7 +17,7 @@ func (r *Repository) FindById(id int64) (employee Entity, err error) {
 	return employee, err
 }
 
-func (r *Repository) Save(employee *Entity) (employeeId int64, err error) {
+func (r *Repository) Save(employee Entity) (employeeId int64, err error) {
 	err = r.db.Get(
 		&employeeId,
 		`insert into employee (name) values ($1) returning id`,

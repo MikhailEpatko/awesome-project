@@ -2,14 +2,14 @@ package tests
 
 import (
 	"github.com/stretchr/testify/assert"
-	"idm/inner/database"
+	"idm/inner/common"
 	"idm/inner/employee"
 	"testing"
 )
 
 func TestRepository(t *testing.T) {
 	a := assert.New(t)
-	var db = database.Connect()
+	var db = common.ConnectDb()
 	var clearDatabase = func() {
 		db.MustExec("delete from employee")
 	}
