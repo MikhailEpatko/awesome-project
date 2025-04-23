@@ -2,7 +2,7 @@ package employee
 
 import (
 	"encoding/json"
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"idm/inner/common"
@@ -38,7 +38,12 @@ func TestCreateEmployee(t *testing.T) {
 		// Готовим тестовое окружение
 		server := web.NewServer()
 		var svc = new(MockService)
-		var controller = NewController(server, svc)
+		var cfg = common.Config{
+			LogDevelopMode: true,
+			LogLevel:       "debug",
+		}
+		var logger = common.NewLogger(cfg)
+		var controller = NewController(server, svc, logger)
 		controller.RegisterRoutes()
 		// Готовим тестовое окружение
 		var body = strings.NewReader("{\"name\": \"john doe\"}")
