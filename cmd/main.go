@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/gofiber/fiber/v2/log"
+	"fmt"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"idm/inner/common"
 	"idm/inner/employee"
@@ -14,29 +15,39 @@ import (
 	"time"
 )
 
+// @title IDM API documentation
+// @BasePath /api/v1/
 func main() {
 	// Перенесли сюда из функции build() парсинг конфига
 	var cfg = common.GetConfig(".env")
+
 	// Создаем логгер
 	var logger = common.NewLogger(cfg)
 	// Отложенный вызов записи сообщений из буфера в лог. Необходимо вызывать перед выходом из приложения
-	defer func() { _ = logger.Sync() }()
-	// передаём конфиг и логгер в функцию создания сервера
-	var server = build(cfg, logger)
-	// Создаем канал для ожидания сигнала завершения работы сервера
-	var done = make(chan bool, 1)
+	defer func() {
+		err := logger.Sync()
+		fmt.Printf("logger synchronization error: %v", err)
+	}()
+	var database = common.ConnectDbWithCfg(cfg)
+
+	// передаём конфиг, логгер и соединение к базе данных в функцию создания сервера
+	var server = build(cfg, logger, database)
+
 	// Запускаем сервер в отдельной горутине
 	go func() {
 		var err = server.App.Listen(":8080")
 		if err != nil {
-			log.Panic("http server error: %s", zap.Error(err))
+			logger.Panic("http server error: %s", zap.Error(err))
 		}
 	}()
+
+	// Создаем канал для ожидания сигнала завершения работы сервера
+	var done = make(chan bool, 1)
 	// Запускаем gracefulShutdown в отдельной горутине
 	go gracefulShutdown(server, done, logger)
 	// Ожидаем сигнал от горутины gracefulShutdown, что сервер завершил работу
 	<-done
-	log.Info("graceful shutdown complete")
+	logger.Info("graceful shutdown complete")
 }
 
 // gracefulShutdown - функция "элегантного" завершения работы сервера по сигналу от операционной системы
@@ -66,9 +77,12 @@ func gracefulShutdown(
 }
 
 // build - функция сборки приложения
-func build(cfg common.Config, logger *common.Logger) *web.Server {
+func build(
+	cfg common.Config,
+	logger *common.Logger,
+	database *sqlx.DB,
+) *web.Server {
 	var server = web.NewServer()
-	var database = common.ConnectDbWithCfg(cfg)
 	var vld = validator.New()
 
 	var employeeRepo = employee.NewRepository(database)

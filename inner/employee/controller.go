@@ -38,7 +38,15 @@ func (c *Controller) RegisterRoutes() {
 	c.server.GroupApiV1.Post("/employees", c.CreateEmployee)
 }
 
-// функция-хендлер, которая будет вызываться при POST запросе по маршруту "/api/v1/employees"
+// Функция-хендлер, которая будет вызываться при POST запросе по маршруту "/api/v1/employees"
+// @Description Create a new employee.
+// @Summary create a new employee
+// @Tags employee
+// @Accept json
+// @Produce json
+// @Param request body employee.CreateRequest true "Employee"
+// @Success 200 {object} common.Response
+// @Router /employees [post]
 func (c *Controller) CreateEmployee(ctx *fiber.Ctx) error {
 	// анмаршалим JSON body запроса в структуру CreateRequest
 	var request CreateRequest

@@ -1,0 +1,47 @@
+basePath: /api/v1/
+definitions:
+  common.Response:
+    properties:
+      data: {}
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  employee.CreateRequest:
+    properties:
+      name:
+        maxLength: 155
+        minLength: 2
+        type: string
+    required:
+    - name
+    type: object
+info:
+  contact: {}
+  title: IDM API documentation
+  version: 0.0.0
+paths:
+  /employees:
+    post:
+      consumes:
+      - application/json
+      description: Create a new employee.
+      parameters:
+      - description: Employee
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/employee.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/common.Response'
+      summary: create a new employee
+      tags:
+      - employee
+swagger: "2.0"
