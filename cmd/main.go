@@ -4,6 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"github.com/gofiber/swagger"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"idm/inner/common"
@@ -96,7 +99,14 @@ func build(
 	logger *common.Logger,
 	database *sqlx.DB,
 ) *web.Server {
+	// Создаём сервер
 	var server = web.NewServer()
+	// Регистрируем middleware
+	server.App.Use("/swagger/*", swagger.HandlerDefault)
+	server.App.Use(requestid.New())
+	server.App.Use(recover.New())
+	server.GroupApi.Use(web.AuthMiddleware(logger))
+
 	var vld = validator.New()
 
 	var employeeRepo = employee.NewRepository(database)

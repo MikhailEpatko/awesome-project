@@ -19,6 +19,7 @@ type Config struct {
 	LogDevelopMode bool
 	SslSert        string `validate:"required"`
 	SslKey         string `validate:"required"`
+	KeycloakJwkUrl string `validate:"required"`
 }
 
 // GetConfig получение конфигурации из .env файла или переменных окружения
@@ -26,7 +27,7 @@ func GetConfig(envFile string) Config {
 	var err = godotenv.Load(envFile)
 	// если нет файла, то залогируем это и попробуем получить конфиг из переменных окружения
 	if err != nil {
-		log.Info("Error loading .env file: %v\n", zap.Error(err))
+		log.Info("error loading .env file: %v\n", zap.Error(err))
 	}
 	var cfg = Config{
 		DbDriverName:   os.Getenv("DB_DRIVER_NAME"),
@@ -37,6 +38,7 @@ func GetConfig(envFile string) Config {
 		LogDevelopMode: os.Getenv("LOG_DEVELOP_MODE") == "true",
 		SslSert:        os.Getenv("SSL_SERT"),
 		SslKey:         os.Getenv("SSL_KEY"),
+		KeycloakJwkUrl: os.Getenv("KEYCLOAK_JWK_URL"),
 	}
 	err = validator.New().Struct(cfg)
 	if err != nil {

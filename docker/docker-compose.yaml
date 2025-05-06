@@ -30,14 +30,14 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.2.2
     ports:
-      - "9990:8080"
-      - "9991:8443"
+      - 127.0.0.1:9990:8080
+      - 127.0.0.1:9991:8443
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_PROXY: edge
-      KC_METRICS_ENABLED: "false"
-      KC_HEALTH_ENABLED: "false"
+      KC_METRICS_ENABLED: false
+      KC_HEALTH_ENABLED: false
       KC_DB: postgres
       KC_DB_URL_HOST: postgres-db
       KC_DB_URL_PORT: 5432

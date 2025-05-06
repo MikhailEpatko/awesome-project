@@ -3,9 +3,11 @@ package employee
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
 	"idm/inner/common"
 	"idm/inner/web"
+	"slices"
 )
 
 type Controller struct {
@@ -48,6 +50,12 @@ func (c *Controller) RegisterRoutes() {
 // @Success 200 {object} common.Response
 // @Router /employees [post]
 func (c *Controller) CreateEmployee(ctx *fiber.Ctx) error {
+	// проверяем наличие нужной роли в токене
+	var t = ctx.Locals(web.JwtKey).(*jwt.Token)
+	var cl = t.Claims.(*web.IdmClaims)
+	if !slices.Contains(cl.RealmAccess.Roles, web.IdmAdmin) {
+		return common.ErrResponse(ctx, fiber.StatusForbidden, "Permission denied")
+	}
 	// анмаршалим JSON body запроса в структуру CreateRequest
 	var request CreateRequest
 	if err := ctx.BodyParser(&request); err != nil {
