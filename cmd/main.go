@@ -20,6 +20,7 @@ import (
 )
 
 // @title IDM API documentation
+// @Version 0.0.0
 // @BasePath /api/v1/
 func main() {
 	// Перенесли сюда из функции build() парсинг конфига

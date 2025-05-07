@@ -13,7 +13,7 @@ golangci-lint run
 
 goose create <script_name> sql
 
-goose up
+goose up -dir ./migrations
 
 ## Swagger
 
