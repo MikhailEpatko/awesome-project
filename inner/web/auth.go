@@ -35,7 +35,10 @@ var AuthMiddleware = func(logger *common.Logger) fiber.Handler {
 
 func createJwtErrorHandler(logger *common.Logger) fiber.ErrorHandler {
 	return func(ctx *fiber.Ctx, err error) error {
-		logger.Error("failed autentication", zap.Error(err))
+		// было:
+		//logger.Error("failed autentication", zap.Error(err))
+		// стало:
+		logger.ErrorCtx(ctx.Context(), "failed autentication", zap.Error(err))
 		// Если токен не может быть прочитан, то возвращаем 401
 		return common.ErrResponse(
 			ctx,

@@ -15,6 +15,7 @@ import (
 	"idm/inner/validator"
 	"idm/inner/web"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -33,7 +34,13 @@ func main() {
 		err := logger.Sync()
 		fmt.Printf("logger synchronization error: %v", err)
 	}()
+
 	var database = common.ConnectDbWithCfg(cfg)
+	defer func() {
+		if err := database.Close(); err != nil {
+			logger.Error("error closing db: %v", zap.Error(err))
+		}
+	}()
 
 	// передаём конфиг, логгер и соединение к базе данных в функцию создания сервера
 	var server = build(cfg, logger, database)
@@ -59,21 +66,25 @@ func main() {
 		}
 	}()
 
-	// Создаем канал для ожидания сигнала завершения работы сервера
-	var done = make(chan bool, 1)
+	// Создаем группу для ожидания сигнала завершения работы сервера
+	var wg = &sync.WaitGroup{}
+	wg.Add(1)
+
 	// Запускаем gracefulShutdown в отдельной горутине
-	go gracefulShutdown(server, done, logger)
+	go gracefulShutdown(server, wg, logger)
 	// Ожидаем сигнал от горутины gracefulShutdown, что сервер завершил работу
-	<-done
+	wg.Wait()
 	logger.Info("graceful shutdown complete")
 }
 
 // gracefulShutdown - функция "элегантного" завершения работы сервера по сигналу от операционной системы
 func gracefulShutdown(
 	server *web.Server,
-	done chan bool,
+	wg *sync.WaitGroup,
 	logger *common.Logger,
 ) {
+	// Уведомить основную горутину о завершении работы
+	defer wg.Done()
 	// Создаём контекст, который слушает сигнал прерывания от ОС.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -90,8 +101,6 @@ func gracefulShutdown(
 		logger.Error("Server forced to shutdown with error", zap.Error(err))
 	}
 	logger.Info("Server exiting")
-	// Уведомить основную горутину о завершении работы
-	done <- true
 }
 
 // build - функция сборки приложения

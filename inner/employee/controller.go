@@ -61,13 +61,13 @@ func (c *Controller) CreateEmployee(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&request); err != nil {
 		return common.ErrResponse(ctx, fiber.StatusBadRequest, err.Error())
 	}
-	// логируем тело запроса
-	c.logger.Debug("create employee: received request", zap.Any("request", request))
+	// логируем тело запроса (в fiber для этого есть отдельное middleware)
+	c.logger.DebugCtx(ctx.Context(), "create employee: received request", zap.Any("request", request))
 	// вызываем метод CreateEmployee сервиса employee.Service
 	var newEmployeeId, err = c.employeeService.CreateEmployee(request)
 	if err != nil {
 		// логируем ошибку
-		c.logger.Error("create employee", zap.Error(err))
+		c.logger.ErrorCtx(ctx.Context(), "create employee", zap.Error(err))
 		switch {
 		// если сервис возвращает ошибку RequestValidationError или AlreadyExistsError,
 		// то мы возвращаем ответ с кодом 400 (BadRequest)

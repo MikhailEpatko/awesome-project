@@ -1,8 +1,10 @@
 package common
 
 import (
+	"context"
 	"github.com/gofiber/contrib/fiberzap/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -76,4 +78,94 @@ func parseLogLevel(level string) zapcore.Level {
 	default:
 		return zapcore.InfoLevel
 	}
+}
+
+// ключ для получения requestId из контекста
+var ridKey = requestid.ConfigDefault.ContextKey.(string)
+
+// функция логирования с добавлением requestId
+func (l *Logger) DebugCtx(
+	ctx context.Context,
+	msg string,
+	fields ...zap.Field,
+) {
+	// получаем requestId из контекста
+	var rid string
+	if v := ctx.Value(ridKey); v != nil {
+		rid = v.(string)
+	}
+	// добавляем для логирования поле с requestId
+	fields = append(fields, zap.String(ridKey, rid))
+	// вызываем метод логгера
+	l.Debug(msg, fields...)
+}
+
+func (l *Logger) InfoCtx(
+	ctx context.Context,
+	msg string,
+	fields ...zap.Field,
+) {
+	// получаем requestId из контекста
+	var rid string
+	if v := ctx.Value(ridKey); v != nil {
+		rid = v.(string)
+	}
+	fields = append(fields, zap.String(ridKey, rid))
+	l.Info(msg, fields...)
+}
+
+func (l *Logger) WarnCtx(
+	ctx context.Context,
+	msg string,
+	fields ...zap.Field,
+) {
+	// получаем requestId из контекста
+	var rid string
+	if v := ctx.Value(ridKey); v != nil {
+		rid = v.(string)
+	}
+	fields = append(fields, zap.String(ridKey, rid))
+	l.Warn(msg, fields...)
+}
+
+func (l *Logger) ErrorCtx(
+	ctx context.Context,
+	msg string,
+	fields ...zap.Field,
+) {
+	// получаем requestId из контекста
+	var rid string
+	if v := ctx.Value(ridKey); v != nil {
+		rid = v.(string)
+	}
+	fields = append(fields, zap.String(ridKey, rid))
+	l.Error(msg, fields...)
+}
+
+func (l *Logger) PanicCtx(
+	ctx context.Context,
+	msg string,
+	fields ...zap.Field,
+) {
+	// получаем requestId из контекста
+	var rid string
+	if v := ctx.Value(ridKey); v != nil {
+		rid = v.(string)
+	}
+	fields = append(fields, zap.String(ridKey, rid))
+	l.Panic(msg, fields...)
+}
+
+func (l *Logger) FatalCtx(
+	ctx context.Context,
+	msg string,
+	fields ...zap.Field,
+) {
+	// получаем requestId из контекста
+	var rid string
+	if v := ctx.Value(ridKey); v != nil {
+		rid = v.(string)
+	}
+	fields = append(fields, zap.String(ridKey, rid))
+	l.Fatal(msg, fields...)
 }
