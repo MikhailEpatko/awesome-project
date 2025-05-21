@@ -35,7 +35,7 @@ const docTemplate = `{
                 "summary": "create a new employee",
                 "parameters": [
                     {
-                        "description": "Employee",
+                        "description": "create employee request",
                         "name": "request",
                         "in": "body",
                         "required": true,

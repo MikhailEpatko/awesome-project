@@ -28,7 +28,7 @@ paths:
       - application/json
       description: Create a new employee.
       parameters:
-      - description: Employee
+      - description: create employee request
         in: body
         name: request
         required: true

@@ -46,7 +46,7 @@ func (c *Controller) RegisterRoutes() {
 // @Tags employee
 // @Accept json
 // @Produce json
-// @Param request body employee.CreateRequest true "Employee"
+// @Param request body employee.CreateRequest true "create employee request"
 // @Success 200 {object} common.Response[int64]
 // @Failure 400 {object} common.Response[int64]
 // @Failure 403 {object} common.Response[int64]
