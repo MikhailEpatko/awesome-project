@@ -48,9 +48,9 @@ func (c *Controller) RegisterRoutes() {
 // @Produce json
 // @Param request body employee.CreateRequest true "Employee"
 // @Success 200 {object} common.Response[int64]
-// @Failure 400 {object} common.Response[string]
-// @Failure 403 {object} common.Response[string]
-// @Failure 500 {object} common.Response[string]
+// @Failure 400 {object} common.Response[int64]
+// @Failure 403 {object} common.Response[int64]
+// @Failure 500 {object} common.Response[int64]
 // @Security ApiKeyAuth
 // @Router /employees [post]
 func (c *Controller) CreateEmployee(ctx *fiber.Ctx) error {

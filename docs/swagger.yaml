@@ -17,15 +17,6 @@ definitions:
       success:
         type: boolean
     type: object
-  idm_inner_common.Response-string:
-    properties:
-      data:
-        type: string
-      error:
-        type: string
-      success:
-        type: boolean
-    type: object
 info:
   contact: {}
   title: IDM API documentation
@@ -53,15 +44,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/idm_inner_common.Response-string'
+            $ref: '#/definitions/idm_inner_common.Response-int64'
         "403":
           description: Forbidden
           schema:
-            $ref: '#/definitions/idm_inner_common.Response-string'
+            $ref: '#/definitions/idm_inner_common.Response-int64'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/idm_inner_common.Response-string'
+            $ref: '#/definitions/idm_inner_common.Response-int64'
       security:
       - ApiKeyAuth: []
       summary: create a new employee

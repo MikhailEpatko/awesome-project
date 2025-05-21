@@ -54,19 +54,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/idm_inner_common.Response-string"
+                            "$ref": "#/definitions/idm_inner_common.Response-int64"
                         }
                     },
                     "403": {
                         "description": "Forbidden",
                         "schema": {
-                            "$ref": "#/definitions/idm_inner_common.Response-string"
+                            "$ref": "#/definitions/idm_inner_common.Response-int64"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/idm_inner_common.Response-string"
+                            "$ref": "#/definitions/idm_inner_common.Response-int64"
                         }
                     }
                 }
@@ -92,20 +92,6 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "type": "integer"
-                },
-                "error": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "idm_inner_common.Response-string": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "string"
                 },
                 "error": {
                     "type": "string"
