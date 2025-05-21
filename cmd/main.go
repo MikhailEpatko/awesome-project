@@ -22,6 +22,9 @@ import (
 
 // @title IDM API documentation
 // @Version 0.0.0
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 // @BasePath /api/v1/
 func main() {
 	// Перенесли сюда из функции build() парсинг конфига

@@ -48,6 +48,7 @@ func (c *Controller) RegisterRoutes() {
 // @Produce json
 // @Param request body employee.CreateRequest true "Employee"
 // @Success 200 {object} common.Response
+// @Security ApiKeyAuth
 // @Router /employees [post]
 func (c *Controller) CreateEmployee(ctx *fiber.Ctx) error {
 	// проверяем наличие нужной роли в токене

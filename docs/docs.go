@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/employees": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new employee.",
                 "consumes": [
                     "application/json"
@@ -76,6 +81,13 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
     }
 }`
 
@@ -83,7 +95,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "0.0.0",
 	Host:             "",
-	BasePath:         "/api/v1/",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "IDM API documentation",
 	Description:      "",

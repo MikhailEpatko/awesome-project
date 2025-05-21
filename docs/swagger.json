@@ -5,10 +5,14 @@
         "contact": {},
         "version": "0.0.0"
     },
-    "basePath": "/api/v1/",
     "paths": {
         "/employees": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Create a new employee.",
                 "consumes": [
                     "application/json"
@@ -67,6 +71,13 @@
                     "minLength": 2
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
