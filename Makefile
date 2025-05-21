@@ -15,7 +15,7 @@ vet: fmt
 	golangci-lint run
 
 swagger:
-	swag init -d cmd,inner --parseInternal
+	swag init -d cmd,inner --parseDependency --parseInternal
 
 goose:
 	goose up -dir ./migrations

@@ -2,10 +2,11 @@ package common
 
 import "github.com/gofiber/fiber/v2"
 
-type Response struct {
+// Response[T] generic response
+type Response[T any] struct {
 	Success bool   `json:"success"`
 	Message string `json:"error"`
-	Data    any    `json:"data"`
+	Data    T      `json:"data"`
 }
 
 func ErrResponse(
@@ -13,18 +14,18 @@ func ErrResponse(
 	code int,
 	message string,
 ) error {
-	return c.Status(code).JSON(&Response{
+	return c.Status(code).JSON(&Response[any]{
 		Success: false,
 		Message: message,
 		Data:    nil,
 	})
 }
 
-func OkResponse(
+func OkResponse[T any](
 	c *fiber.Ctx,
-	data any,
+	data T,
 ) error {
-	return c.JSON(&Response{
+	return c.JSON(&Response[T]{
 		Success: true,
 		Data:    data,
 	})

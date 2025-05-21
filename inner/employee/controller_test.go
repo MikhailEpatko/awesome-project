@@ -73,10 +73,10 @@ func TestCreateEmployee(t *testing.T) {
 		a.Equal(http.StatusOK, resp.StatusCode)
 		bytesData, err := io.ReadAll(resp.Body)
 		a.Nil(err)
-		var responseBody common.Response
+		var responseBody common.Response[int64]
 		err = json.Unmarshal(bytesData, &responseBody)
 		a.Nil(err)
-		a.Equal(float64(123), responseBody.Data)
+		a.Equal(int64(123), responseBody.Data)
 		a.True(responseBody.Success)
 		a.Empty(responseBody.Message)
 	})

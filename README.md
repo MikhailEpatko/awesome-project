@@ -17,7 +17,7 @@ goose up -dir ./migrations
 
 ## Swagger
 
-swag init -d cmd,inner --parseInternal
+swag init -d cmd,inner --parseDependency --parseInternal
 
 https://localhost:8080/swagger
 

@@ -48,7 +48,25 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/common.Response"
+                            "$ref": "#/definitions/idm_inner_common.Response-int64"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/idm_inner_common.Response-string"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/idm_inner_common.Response-string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/idm_inner_common.Response-string"
                         }
                     }
                 }
@@ -56,18 +74,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "common.Response": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "error": {
-                    "type": "string"
-                },
-                "success": {
-                    "type": "boolean"
-                }
-            }
-        },
         "employee.CreateRequest": {
             "type": "object",
             "required": [
@@ -78,6 +84,34 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 155,
                     "minLength": 2
+                }
+            }
+        },
+        "idm_inner_common.Response-int64": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "idm_inner_common.Response-string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         }
