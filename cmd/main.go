@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+	"idm/docs"
 	"idm/inner/common"
 	"idm/inner/employee"
 	"idm/inner/info"
@@ -29,7 +30,8 @@ import (
 func main() {
 	// Перенесли сюда из функции build() парсинг конфига
 	var cfg = common.GetConfig(".env")
-
+	// Переопределяем версию приложения, которая будет отображаться swagger UI
+	docs.SwaggerInfo.Version = cfg.AppVersion
 	// Создаем логгер
 	var logger = common.NewLogger(cfg)
 	// Отложенный вызов записи сообщений из буфера в лог. Необходимо вызывать перед выходом из приложения
