@@ -47,11 +47,28 @@ func (svc *Service) CreateEmployee(request CreateRequest) (int64, error) {
 		return 0, common.RequestValidationError{Message: err.Error()}
 	}
 	tx, err := svc.repo.BeginTransaction()
+	// отложенная функция завершения транз
 	defer func() {
-		if err != nil {
-			_ = tx.Rollback()
+		// проверяем, не было ли паники
+		if r := recover(); r != nil {
+			err = fmt.Errorf("creating employee panic: %v", r)
+			// если была паника, то откатываем транзакцию
+			errTx := tx.Rollback()
+			if errTx != nil {
+				err = fmt.Errorf("creating employee: rolling back transaction errors: %w, %w", err, errTx)
+			}
+		} else if err != nil {
+			// если произошла другая ошибка (не паника), то откатываем транзакцию
+			errTx := tx.Rollback()
+			if errTx != nil {
+				err = fmt.Errorf("creating employee: rolling back transaction errors: %w, %w", err, errTx)
+			}
 		} else {
-			err = tx.Commit()
+			// если ошибок нет, то коммитим транзакцию
+			errTx := tx.Commit()
+			if errTx != nil {
+				err = fmt.Errorf("creating employee: commiting transaction error: %w", errTx)
+			}
 		}
 	}()
 	if err != nil {

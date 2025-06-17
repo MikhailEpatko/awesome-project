@@ -3,6 +3,7 @@ package employee
 import (
 	"errors"
 	"fmt"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -81,4 +82,32 @@ func TestFindById(t *testing.T) {
 		a.Equal(want, got)
 		a.True(repo.AssertNumberOfCalls(t, "FindById", 1))
 	})
+
+	t.Run("should create employee transactional success", func(t *testing.T) {
+		db, mk, err := sqlmock.New()
+		if err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		defer func() { _ = db.Close() }()
+		sqlxDB := sqlx.NewDb(db, "postgres")
+		mk.ExpectBegin()
+		mk.ExpectCommit()
+		tx, err := sqlxDB.Beginx()
+		assert.NoError(t, err)
+		var repo = new(MockRepo)
+		var vld = validator.New()
+		var svc = NewService(repo, vld)
+		var request = CreateRequest{Name: "John Doe"}
+		var want = int64(1)
+
+		repo.On("BeginTransaction").Return(tx, nil)
+		repo.On("FindByNameTx", tx, "John Doe").Return(false, nil)
+		repo.On("SaveTx", tx, request.ToEntity()).Return(int64(1), nil)
+
+		newEmployeeId, err := svc.CreateEmployee(request)
+		a.Nil(err)
+		a.Equal(want, newEmployeeId)
+		a.True(repo.AssertNumberOfCalls(t, "FindByNameTx", 1))
+	})
+
 }
