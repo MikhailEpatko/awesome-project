@@ -85,9 +85,7 @@ func TestFindById(t *testing.T) {
 
 	t.Run("should create employee transactional success", func(t *testing.T) {
 		db, mk, err := sqlmock.New()
-		if err != nil {
-			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-		}
+		a.Nil(err)
 		defer func() { _ = db.Close() }()
 		sqlxDB := sqlx.NewDb(db, "postgres")
 		mk.ExpectBegin()
