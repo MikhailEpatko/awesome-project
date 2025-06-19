@@ -2,6 +2,7 @@ package employee
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
@@ -79,5 +80,52 @@ func TestCreateEmployee(t *testing.T) {
 		a.Equal(int64(123), responseBody.Data)
 		a.True(responseBody.Success)
 		a.Empty(responseBody.Message)
+	})
+
+	// тестируем отрицательный сценарий: не можем создать
+	t.Run("should return created employee id", func(t *testing.T) {
+		// Готовим тестовое окружение
+		var cfg = common.Config{
+			LogDevelopMode: true,
+			LogLevel:       "debug",
+		}
+		// создаём тестовый токен аутентификации с ролью web.IdmAdmin
+		var claims = &web.IdmClaims{
+			RealmAccess: web.RealmAccessClaims{Roles: []string{web.IdmAdmin}},
+		}
+		// создаём stub middleware для аутентификации
+		var auth = func(c *fiber.Ctx) error {
+			c.Locals(web.JwtKey, &jwt.Token{Claims: claims})
+			return c.Next()
+		}
+		var logger = common.NewLogger(cfg)
+		var server = web.NewServer()
+		server.GroupApi.Use(auth)
+		var svc = new(MockService)
+		var controller = NewController(server, svc, logger)
+		controller.RegisterRoutes()
+		// Готовим тестовые данные
+		var body = strings.NewReader("{\"name\": \"john doe\"}")
+		var req = httptest.NewRequest(fiber.MethodPost, "/api/v1/employees", body)
+		req.Header.Set("Content-Type", "application/json")
+
+		// Настраиваем поведение мока в тесте
+		svc.On("CreateEmployee", mock.AnythingOfType("CreateRequest")).Return(int64(0), errors.New("some error"))
+
+		// Отправляем тестовый запрос на веб сервер
+		resp, err := server.App.Test(req)
+
+		// Выполняем проверки полученных данных
+		a.Nil(err)
+		a.NotEmpty(resp)
+		a.Equal(http.StatusInternalServerError, resp.StatusCode)
+		bytesData, err := io.ReadAll(resp.Body)
+		a.Nil(err)
+		var responseBody common.Response[int64]
+		err = json.Unmarshal(bytesData, &responseBody)
+		a.Nil(err)
+		a.Equal(int64(0), responseBody.Data)
+		a.False(responseBody.Success)
+		a.Equal("some error", responseBody.Message)
 	})
 }
